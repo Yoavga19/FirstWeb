@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+    <meta charset="UTF-8" />
+    <title>NextWave AI & Web Chatbot</title>
+    <style>
+        body { font-family: Arial, sans-serif; direction: rtl; padding: 20px; background: #f0f4f8; }
+        #chatbox { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);}
+        #response { margin-top: 20px; background: #e1f5fe; padding: 10px; border-radius: 8px; min-height: 50px;}
+        input[type="text"] { width: 80%; padding: 10px; font-size: 1rem; }
+        button { padding: 10px 20px; font-size: 1rem; background: #0288d1; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #026ca0; }
+    </style>
+</head>
+<body>
+    <div id="chatbox">
+        <h1>ברוכים הבאים ל-NextWave AI & Web</h1>
+        <p>כאן תוכלו לשאול שאלות לגבי השירותים שלנו ולקבל תשובות מיידיות!</p>
+
+        <input type="text" id="userInput" placeholder="כתוב את השאלה שלך כאן..." />
+        <button onclick="sendMessage()">שלח</button>
+
+        <div id="response"></div>
+    </div>
+
+    <script>
+        async function sendMessage() {
+            const message = document.getElementById("userInput").value.trim();
+            if (!message) return alert("אנא הזן שאלה.");
+
+            const responseDiv = document.getElementById("response");
+            responseDiv.innerHTML = "טוען...";
+
+            try {
+                const response = await fetch("/ask", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ message })
+                });
+
+                const data = await response.json();
+
+                if (data.answer) {
+                    responseDiv.innerHTML = `<strong>בוט:</strong> ${data.answer}`;
+                } else if (data.error) {
+                    responseDiv.innerHTML = `<strong>שגיאה:</strong> ${data.error}`;
+                } else {
+                    responseDiv.innerHTML = "התגובה ריקה.";
+                }
+            } catch (err) {
+                responseDiv.innerHTML = `<strong>שגיאה בתקשורת עם השרת:</strong> ${err.message}`;
+            }
+        }
+    </script>
+</body>
+</html>
+
